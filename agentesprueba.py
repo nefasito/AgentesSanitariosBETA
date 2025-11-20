@@ -1,5 +1,5 @@
 import streamlit as st
-import streamlit.components.v1 as components # --- IMPORT NUEVO PARA EL BOTÓN ---
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -977,11 +977,9 @@ def main():
     st.set_page_config(page_title="Análisis Demográfico y Sanitario", layout="wide")
     
     # ------------------------------
-    # NUEVO: LOGO EN BARRA LATERAL
+    # LOGO Y ENCABEZADO DE BARRA LATERAL
     # ------------------------------
     with st.sidebar:
-        # Puedes poner una imagen real si tienes la URL, por ejemplo:
-        # st.image("https://tu-url-del-logo.com/logo.png", width=150)
         st.header("🏥 Gestión Sanitaria")
         st.info("Espacio reservado para Logo Institucional o Publicidad del Ministerio/Hospital.")
         st.markdown("---")
@@ -1021,16 +1019,18 @@ def main():
             df_original.rename(columns={'VIVIENDA_DIRECCION': 'DIRECCION'}, inplace=True)
             
             # --- PARÁMETROS GLOBALES EN EL SIDEBAR ---
-            st.sidebar.title("Parámetros Globales")
-            localidad = st.sidebar.text_input("📍 Ingrese el nombre de la localidad", "Mi Localidad")
-            nombre_informe_word = st.sidebar.text_input("📝 Ingrese el nombre para el Informe Word", "Informe Demográfico y Sanitario")
-            
-            st.sidebar.markdown("---")
-            st.sidebar.subheader("Tasas de Simulación (Global)")
-            natalidad_bruta = st.sidebar.number_input("Tasa de natalidad (x 1000)", value=15.0, step=0.1, format="%.1f")
-            mortalidad_bruta = st.sidebar.number_input("Tasa de mortalidad (x 1000)", value=7.5, step=0.1, format="%.1f")
-            tasa_migracion_neta = st.sidebar.number_input("Tasa de migración neta (x 1000)", value=1.0, step=0.1, format="%.1f")
-            tfg = st.sidebar.number_input("Tasa Global Fecundidad (hijos/mujer)", value=2.1, step=0.1, format="%.1f")
+            # Solo se muestran si hay archivo cargado
+            with st.sidebar:
+                st.title("Parámetros Globales")
+                localidad = st.sidebar.text_input("📍 Ingrese el nombre de la localidad", "Mi Localidad")
+                nombre_informe_word = st.sidebar.text_input("📝 Ingrese el nombre para el Informe Word", "Informe Demográfico y Sanitario")
+                
+                st.sidebar.markdown("---")
+                st.sidebar.subheader("Tasas de Simulación (Global)")
+                natalidad_bruta = st.sidebar.number_input("Tasa de natalidad (x 1000)", value=15.0, step=0.1, format="%.1f")
+                mortalidad_bruta = st.sidebar.number_input("Tasa de mortalidad (x 1000)", value=7.5, step=0.1, format="%.1f")
+                tasa_migracion_neta = st.sidebar.number_input("Tasa de migración neta (x 1000)", value=1.0, step=0.1, format="%.1f")
+                tfg = st.sidebar.number_input("Tasa Global Fecundidad (hijos/mujer)", value=2.1, step=0.1, format="%.1f")
 
             # --- SELECCIÓN DE COLUMNA DE FECHA Y EXTRACCIÓN DE AÑO ---
             st.markdown("### 1. Configuración de Fecha")
@@ -1644,7 +1644,7 @@ def main():
         """)
     
     # ------------------------------
-    # NUEVO: PIE DE PÁGINA (FOOTER)
+    # PIE DE PÁGINA PRINCIPAL (Main Footer)
     # ------------------------------
     st.markdown("---") # Línea separadora
     col_footer_1, col_footer_2 = st.columns(2)
@@ -1661,11 +1661,26 @@ def main():
             "Se ruega corroborar toda la información antes de su presentación oficial."
         )
 
-    # --- BOTÓN DE TECITO ---
-    # Se agrega al final para que cargue después del contenido.
-    components.html("""
-    <script type="text/javascript" src="https://cdn.tecito.app/static/js/button.v1.3.js" data-name="bmc-button" data-slug="ivannefa" data-color="#ef4444" data-emoji="" data-font="Comic" data-text="Invitame un tecito" data-outline-color="#000" data-font-color="#FFF" data-tecito-color="#FFF"></script>
-    """, height=60) # Ajuste de altura para contener el botón
+    # ------------------------------
+    # PIE DE BARRA LATERAL (Contacto y Donación)
+    # ------------------------------
+    # Esta sección se agrega SIEMPRE al final de la barra lateral
+    with st.sidebar:
+        st.markdown("---")
+        st.subheader("☕ Apoyo al Desarrollador")
+        st.write("Si la aplicación te fue útil, puedes agradecer con una donación 👇")
+        
+        # Botón de Tecito (Siempre visible)
+        components.html("""
+        <script type="text/javascript" src="https://cdn.tecito.app/static/js/button.v1.3.js" data-name="bmc-button" data-slug="ivannefa" data-color="#ef4444" data-emoji="" data-font="Comic" data-text="Invitame un tecito" data-outline-color="#000" data-font-color="#FFF" data-tecito-color="#FFF"></script>
+        """, height=60)
+
+        st.markdown("---")
+        st.subheader("📧 Feedback & Ideas")
+        st.write("¿Tienes ideas para mejorar la app o encontraste un error? Escríbeme:")
+        
+        # Botón mailto
+        st.link_button("✉️ Enviar correo a Soporte", "mailto:hhepatalgina@gmail.com")
 
 
 if __name__ == "__main__":
