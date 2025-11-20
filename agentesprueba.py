@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -1670,10 +1669,28 @@ def main():
         st.subheader("☕ Apoyo al Desarrollador")
         st.write("Si la aplicación te fue útil, puedes agradecer con una donación 👇")
         
-        # Botón de Tecito (Siempre visible)
-        components.html("""
-        <script type="text/javascript" src="https://cdn.tecito.app/static/js/button.v1.3.js" data-name="bmc-button" data-slug="ivannefa" data-color="#ef4444" data-emoji="" data-font="Comic" data-text="Invitame un tecito" data-outline-color="#000" data-font-color="#FFF" data-tecito-color="#FFF"></script>
-        """, height=60)
+        # Botón HTML personalizado para que se vea "ordenado" y rojo
+        st.markdown("""
+            <a href="https://tecito.app/ivannefa" target="_blank">
+                <button style="
+                    width: 100%;
+                    background-color: #ef4444;
+                    border: none;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 16px;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 8px;
+                    font-weight: bold;
+                ">
+                    ☕ Invitame un Tecito
+                </button>
+            </a>
+            """, unsafe_allow_html=True)
 
         st.markdown("---")
         st.subheader("📧 Feedback & Ideas")
