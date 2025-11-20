@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components # --- IMPORT NUEVO PARA EL BOTÓN ---
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -175,14 +176,12 @@ def graficar_piramide(df, localidad=""):
     """
     Genera y devuelve una pirámide poblacional con grupos quinquenales y colores pastel,
     y los datos subyacentes.
-    AHORA CON ETIQUETAS DE DATOS Y TÍTULO MEJORADO.
     """
     if df.empty or df['EDAD'].isnull().all():
         fig, ax = plt.subplots()
         ax.text(0.5, 0.5, "No hay datos para la pirámide", horizontalalignment='center', verticalalignment='center')
         return fig, pd.DataFrame(columns=["Grupo de Edad", "Hombres", "Mujeres"])
 
-    # --- MODIFICADO: Añadir N al título ---
     N_total = len(df)
     
     bins = list(range(0, 100, 5)) + [np.inf]
@@ -206,11 +205,9 @@ def graficar_piramide(df, localidad=""):
     bars_h = ax.barh(grupos, -hombres_counts.values, color=color_hombres, label="Hombres")
     bars_m = ax.barh(grupos, mujeres_counts.values, color=color_mujeres, label="Mujeres")
 
-    # --- MODIFICADO: Aumentar tamaño de fuente de etiquetas de datos ---
     ax.bar_label(bars_h, labels=[f'{abs(int(v))}' for v in hombres_counts.values], padding=3, color='black', fontsize=10)
     ax.bar_label(bars_m, labels=[f'{int(v)}' for v in mujeres_counts.values], padding=3, color='black', fontsize=10)
     
-    # --- MODIFICADO: Aumentar tamaño de fuente de ejes y título ---
     ax.set_xlabel("Población", fontsize=12)
     ax.set_ylabel("Grupos de edad", fontsize=12)
     titulo = f"Pirámide Poblacional de {localidad.title() if localidad else 'la Localidad'} (N={N_total})"
@@ -237,7 +234,6 @@ def graficar_piramide(df, localidad=""):
     return fig, df_piramide_data
 
 def graficar_genero(df, localidad=""):
-    # --- MODIFICADO: Añadir N y etiquetas de datos (N y %) ---
     if df.empty or df['GENERO'].isnull().all():
         fig, ax = plt.subplots()
         ax.text(0.5, 0.5, "No hay datos de género", horizontalalignment='center', verticalalignment='center')
@@ -250,7 +246,6 @@ def graficar_genero(df, localidad=""):
         ax.text(0.5, 0.5, "No hay datos de género", horizontalalignment='center', verticalalignment='center')
         return fig
     
-    # --- MODIFICADO: Añadir N al título ---
     N_total = conteo_genero.sum()
         
     color_map = {"masculino": "#A7D8A9", "femenino": "#FFB6C1"}
@@ -259,7 +254,6 @@ def graficar_genero(df, localidad=""):
     
     fig, ax = plt.subplots(figsize=(8, 8))
     
-    # --- MODIFICADO: Formato de autopct para mostrar % y N ---
     def autopct_format(p):
         count = int(round(p * N_total / 100.0))
         return f'{p:.1f}%\n({count})'
@@ -267,7 +261,6 @@ def graficar_genero(df, localidad=""):
     ax.pie(conteo_genero.values, labels=labels, autopct=autopct_format, startangle=90, colors=colors)
     ax.axis('equal')
     
-    # --- MODIFICADO: Título con N y fuente más grande ---
     titulo = f"Distribución por Género en {localidad.title() if localidad else 'la Localidad'} (N={N_total})"
     ax.set_title(titulo, fontsize=18, fontweight='bold')
     fig.tight_layout()
@@ -276,8 +269,6 @@ def graficar_genero(df, localidad=""):
 def graficar_analisis_adicional(df):
     """
     Genera gráficos para variables socio-económicas (NO de salud).
-    La salud se grafica en 'graficar_estadisticas_salud'.
-    AHORA CON ETIQUETAS DE DATOS Y TÍTULO MEJORADO.
     """
     figs = {}
     
@@ -288,19 +279,16 @@ def graficar_analisis_adicional(df):
     if 'SITUACION_LABORAL' in df.columns:
         counts = df['SITUACION_LABORAL'].value_counts()
         if not counts.empty:
-            N_laboral = counts.sum() # N específico para este gráfico
+            N_laboral = counts.sum()
             fig, ax = plt.subplots(figsize=(10, 6))
             bars = counts.plot(kind='bar', ax=ax, color='#A7D8A9')
             
-            # --- MODIFICADO: Título con N y fuente ---
             ax.set_title(f'Distribución por Situación Laboral (N={N_laboral})', fontsize=16, fontweight='bold')
             ax.set_ylabel('Cantidad de Personas', fontsize=12)
             ax.tick_params(axis='x', rotation=45)
             ax.spines['right'].set_visible(False)
             ax.spines['top'].set_visible(False)
             
-            # --- MODIFICADO: Añadir etiquetas de datos ---
-            # Se corrige el error. 'bars' es el Eje (Axes), el contenedor está en ax.containers[0]
             if ax.containers:
                 ax.bar_label(ax.containers[0], fmt='%.0f', fontsize=10, padding=3)
             
@@ -311,27 +299,22 @@ def graficar_analisis_adicional(df):
     if 'VIVIENDA_TENENCIA' in df.columns:
         counts = df['VIVIENDA_TENENCIA'].value_counts()
         if not counts.empty:
-            N_vivienda = counts.sum() # N específico para este gráfico
+            N_vivienda = counts.sum()
             fig, ax = plt.subplots(figsize=(10, 6))
             bars = counts.plot(kind='bar', ax=ax, color='#FFB6C1')
 
-            # --- MODIFICADO: Título con N y fuente ---
             ax.set_title(f'Distribución por Tenencia de Vivienda (N={N_vivienda})', fontsize=16, fontweight='bold')
             ax.set_ylabel('Cantidad de Personas', fontsize=12)
             ax.tick_params(axis='x', rotation=45)
             ax.spines['right'].set_visible(False)
             ax.spines['top'].set_visible(False)
 
-            # --- MODIFICADO: Añadir etiquetas de datos ---
-            # Se corrige el error. 'bars' es el Eje (Axes), el contenedor está en ax.containers[0]
             if ax.containers:
                 ax.bar_label(ax.containers[0], fmt='%.0f', fontsize=10, padding=3)
 
             fig.tight_layout()
             figs['vivienda_tenencia'] = fig
             
-    # NOTA: Las condiciones de salud se eliminaron de esta función.
-
     return figs
 
 # --------------------------------
@@ -341,40 +324,29 @@ def graficar_analisis_adicional(df):
 def calcular_estadisticas_salud(df):
     """
     Calcula estadísticas para enfermedades, control de niño, vacunas y cobertura de obra social.
-    ¡¡AHORA INCLUYE EL CÁLCULO DE DUAL (DBT+HTA) Y EMBARAZADAS!!
-    --- ¡¡NUEVO!! ---
-    Devuelve 'stats' (diccionario de conteos) y 'filtros_booleanos' (diccionario de Series booleanas para padrones)
-    --- ¡¡MODIFICADO!! ---
-    Añade desglose de OS para Embarazadas, Mayores 65 y Menores 15.
     """
-    # Definir la fecha de "hoy" para cálculos (basado en el contexto de la simulación)
-    # TODAY = pd.to_datetime('2025-11-06') # <- Versión anterior
-    TODAY = pd.to_datetime('today').normalize() # ¡¡CORREGIDO!! Usa la fecha actual
+    TODAY = pd.to_datetime('today').normalize() 
         
     stats = {
         'enfermedades': {},
         'control_nino': {},
         'vacunas': {},
-        'enfermedades_obra_social': {}, # NUEVO
-        'obra_social_general': {},     # NUEVO
-        'embarazadas': {},             # ¡¡NUEVO!!
-        'mayores_65_os': {},           # ¡¡NUEVO!!
-        'menores_15_os': {}            # ¡¡NUEVO!!
+        'enfermedades_obra_social': {},
+        'obra_social_general': {},
+        'embarazadas': {},
+        'mayores_65_os': {},
+        'menores_15_os': {}
     }
     
-    # --- ¡¡NUEVO!! ---
-    # Diccionario para guardar las Series booleanas (los filtros)
     filtros_booleanos = {}
     
     if df.empty:
-        return stats, filtros_booleanos # Devuelve ambos vacíos
+        return stats, filtros_booleanos 
 
-    # --- NUEVO: Procesamiento de OBRA_SOCIAL ---
+    # --- Procesamiento de OBRA_SOCIAL ---
     if 'OBRA_SOCIAL' in df.columns:
-        # Limpieza robusta de OBRA_SOCIAL
         df['OBRA_SOCIAL_limpia'] = df['OBRA_SOCIAL'].astype(str).str.strip().str.replace('sí', 'si', case=False).str.lower()
         
-        # 1. Cálculo General de Obra Social
         total_con_os = (df['OBRA_SOCIAL_limpia'] == 'si').sum()
         total_sin_os = (df['OBRA_SOCIAL_limpia'] == 'no').sum()
         total_poblacion = len(df)
@@ -388,53 +360,40 @@ def calcular_estadisticas_salud(df):
             'Indice Mutualizacion (%)': round(indice_general, 2)
         }
     else:
-        # Si no hay columna, se deja 'OBRA_SOCIAL_limpia' como 'sin datos' para evitar errores
         df['OBRA_SOCIAL_limpia'] = 'sin datos'
-    # --- FIN NUEVO ---
-
 
     # 1. Estadísticas de Enfermedades
     ENFERMEDADES_COLS = ['DIABETES', 'HTA', 'CHAGAS', 'TBC', 'CANCER']
     enfermedades_presentes = [c for c in ENFERMEDADES_COLS if c in df.columns]
     
-    # --- MODIFICADO PARA DUAL ---
-    # 1. Crear todos los filtros base primero
-    filtros_enfermedades_base = {} # Renombrado para claridad
+    filtros_enfermedades_base = {}
     for col in enfermedades_presentes:
-        # Limpieza de datos (robusta)
         valor_limpio = df[col].astype(str).str.strip().str.replace('sí', 'si', case=False).str.lower()
         filtro_bool = (valor_limpio == 'si')
-        filtros_enfermedades_base[col] = filtro_bool # Guardar el filtro (Serie booleana)
-        
-        # --- ¡¡NUEVO!! Guardar filtro para padrón ---
+        filtros_enfermedades_base[col] = filtro_bool
         filtros_booleanos[col] = filtro_bool
 
     # 2. Añadir el filtro DUAL si existen DIABETES y HTA
     if 'DIABETES' in filtros_enfermedades_base and 'HTA' in filtros_enfermedades_base:
-        # & (AND) lógico elemento a elemento entre las dos Series booleanas
         filtro_dual = filtros_enfermedades_base['DIABETES'] & filtros_enfermedades_base['HTA']
         filtros_enfermedades_base['DUAL (DBT+HTA)'] = filtro_dual
-        
-        # --- ¡¡NUEVO!! Guardar filtro para padrón ---
         filtros_booleanos['DUAL (DBT+HTA)'] = filtro_dual
 
 
-    # 3. Procesar todos los filtros (incluyendo DUAL) para conteos y cobertura OS
+    # 3. Procesar todos los filtros
     counts_enf = {}
     if filtros_enfermedades_base:
-        # Iterar sobre el diccionario: clave=nombre_col, valor=filtro_booleano
         for col, filtro_enfermedad in filtros_enfermedades_base.items():
             
-            # Contar solo "si" (total de 'True' en el filtro)
             counts_enf[col] = filtro_enfermedad.sum()
 
-            # --- Cálculo de OS para esta enfermedad (incluyendo DUAL) ---
-            if 'OBRA_SOCIAL' in df.columns: # Solo si existe la columna
-                df_enfermos = df[filtro_enfermedad] # Subset de personas con la enfermedad
+            # --- Cálculo de OS para esta enfermedad ---
+            if 'OBRA_SOCIAL' in df.columns:
+                df_enfermos = df[filtro_enfermedad]
                 
                 con_os = (df_enfermos['OBRA_SOCIAL_limpia'] == 'si').sum()
                 sin_os = (df_enfermos['OBRA_SOCIAL_limpia'] == 'no').sum()
-                total_enf = filtro_enfermedad.sum() # Esto es 'Total Enfermos'
+                total_enf = filtro_enfermedad.sum()
 
                 con_os_pct = (con_os / total_enf) * 100 if total_enf > 0 else 0
                 sin_os_pct = (sin_os / total_enf) * 100 if total_enf > 0 else 0
@@ -446,71 +405,49 @@ def calcular_estadisticas_salud(df):
                     'Con OS (%)': round(con_os_pct, 2),
                     'Sin OS (%)': round(sin_os_pct, 2)
                 }
-            # --- FIN CÁLCULO OS ---
     
-    if counts_enf: # Comprobar si el diccionario no está vacío
+    if counts_enf: 
         if sum(counts_enf.values()) > 0:
             stats['enfermedades'] = counts_enf
-    # --- FIN MODIFICADO PARA DUAL ---
-
 
     # 2. Estadísticas de Control Niño
-    CONTROL_NINO_COL = 'NIÑO_CONTROLES_COMPLETOS' # Corregido segun solicitud
+    CONTROL_NINO_COL = 'NIÑO_CONTROLES_COMPLETOS' 
     if CONTROL_NINO_COL in df.columns:
-        # Limpieza robusta
         valor_limpio_cn = df[CONTROL_NINO_COL].astype(str).str.strip().str.replace('sí', 'si', case=False).str.lower()
-        
-        # Mapear valores a categorías claras
         mapa_control = {
             'si': 'Completo', 'completo': 'Completo',
             'no': 'Incompleto', 'incompleto': 'Incompleto'
         }
-        
-        # --- MODIFICADO: Aplicar mapeo, ELIMINAR nulos (Sin Datos) y luego contar. ---
         mapped_cn = valor_limpio_cn.map(mapa_control)
         counts_cn = mapped_cn.dropna().value_counts()
         stats['control_nino'] = counts_cn.to_dict()
 
     # 3. Estadísticas de Vacunas
-    VACUNAS_COL = 'NIÑO_VACUNACION_COMPLETA' # Corregido segun solicitud
+    VACUNAS_COL = 'NIÑO_VACUNACION_COMPLETA'
     if VACUNAS_COL in df.columns:
-        # Limpieza robusta
         valor_limpio_vac = df[VACUNAS_COL].astype(str).str.strip().str.replace('sí', 'si', case=False).str.lower()
-
-        # Mapear valores a categorías claras
         mapa_vacunas = {
             'si': 'Completas', 'completo': 'Completas', 'completas': 'Completas',
             'no': 'Incompletas', 'incompleto': 'Incompletas', 'incompletas': 'Incompletas'
         }
-        
-        # --- MODIFICADO: Aplicar mapeo, ELIMINAR nulos (Sin Datos) y luego contar. ---
         mapped_vac = valor_limpio_vac.map(mapa_vacunas)
         counts_vac = mapped_vac.dropna().value_counts()
         stats['vacunas'] = counts_vac.to_dict()
 
-    # 4. Estadísticas de Embarazo (NUEVO)
+    # 4. Estadísticas de Embarazo
     EMBARAZO_FUM_COL = 'MUJER_FUM'
     if EMBARAZO_FUM_COL in df.columns:
-        
-        # Convertir FUM a datetime (dayfirst=True para formato DD/MM/YYYY)
         fum_dates = pd.to_datetime(df[EMBARAZO_FUM_COL], errors='coerce', dayfirst=True)
-        
-        # Calcular fecha probable de parto (FUM + 9 meses, según solicitud)
         approx_fpp = pd.Series(pd.NaT, index=df.index, dtype='datetime64[ns]')
         if not fum_dates.isna().all():
             try:
-                # Usar pd.DateOffset para sumar 9 meses
                 approx_fpp = fum_dates + pd.DateOffset(months=9)
             except Exception:
-                # Fallback (menos preciso) si DateOffset falla
                 approx_fpp = fum_dates + pd.to_timedelta(270, unit='D') 
 
-        # Crear el filtro booleano
-        # El filtro (approx_fpp >= TODAY) manejará NaTs (dando False)
         filtro_embarazadas = (approx_fpp >= TODAY) & (fum_dates.notna())
         total_embarazadas = filtro_embarazadas.sum()
         
-        # --- ¡¡MODIFICACIÓN!! CALCULAR OS PARA EMBARAZADAS ---
         emb_con_os = 0
         emb_sin_os = 0
         emb_con_os_pct = 0
@@ -530,14 +467,11 @@ def calcular_estadisticas_salud(df):
             'Con OS (%)': round(emb_con_os_pct, 2),
             'Sin OS (%)': round(emb_sin_os_pct, 2)
         }
-        # --- FIN MODIFICACIÓN ---
         
-        # --- ¡¡NUEVO!! Guardar filtro para padrón ---
         filtros_booleanos['EMBARAZADAS'] = filtro_embarazadas
         
-    # --- FIN NUEVO ---
 
-    # --- ¡¡¡NUEVA SECCIÓN: CÁLCULO OS POR GRUPOS DE EDAD!!! ---
+    # 5. Cálculo OS por Grupos de Edad
     if 'OBRA_SOCIAL_limpia' in df.columns and 'EDAD' in df.columns:
         
         # 5.a. Mayores de 65 años
@@ -575,17 +509,12 @@ def calcular_estadisticas_salud(df):
             'Con OS (%)': round(menores_con_os_pct, 2),
             'Sin OS (%)': round(menores_sin_os_pct, 2)
         }
-    # --- FIN NUEVA SECCIÓN ---
 
+    return stats, filtros_booleanos
 
-    return stats, filtros_booleanos # --- MODIFICADO EL RETURN ---
-
-# --- MODIFICADO: Aceptar N_total_poblacion ---
 def graficar_estadisticas_salud(stats_dict, localidad="", N_total_poblacion=0):
     """
     Genera gráficos de barras para las estadísticas de salud calculadas.
-    AHORA CON ETIQUETAS DE DATOS Y TÍTULO MEJORADO.
-    (Esta función no necesita cambios para DUAL, lo toma automáticamente)
     """
     figs = {}
     
@@ -595,15 +524,12 @@ def graficar_estadisticas_salud(stats_dict, localidad="", N_total_poblacion=0):
         data_enf = pd.Series(stats_dict['enfermedades']).sort_values(ascending=False)
         bars = data_enf.plot(kind='bar', ax=ax_enf, color='#A7D8A9')
         
-        # --- MODIFICADO: Título con N y fuente ---
         ax_enf.set_title(f'Prevalencia de Enfermedades en {localidad.title()} (N={N_total_poblacion})', fontsize=16, fontweight='bold')
         ax_enf.set_ylabel('Cantidad de Casos Positivos', fontsize=12)
         ax_enf.tick_params(axis='x', rotation=45)
         ax_enf.spines['right'].set_visible(False)
         ax_enf.spines['top'].set_visible(False)
         
-        # --- MODIFICADO: Añadir etiquetas de datos ---
-        # Se corrige el error. 'bars' es el Eje (Axes), el contenedor está en ax_enf.containers[0]
         if ax_enf.containers:
             ax_enf.bar_label(ax_enf.containers[0], fmt='%.0f', fontsize=10, padding=3)
         
@@ -615,21 +541,17 @@ def graficar_estadisticas_salud(stats_dict, localidad="", N_total_poblacion=0):
     # Gráfico de Control Niño
     if stats_dict['control_nino']:
         fig_cn, ax_cn = plt.subplots(figsize=(8, 5))
-        data_cn = pd.Series(stats_dict['control_nino']).sort_index() # Ordenar (Completo, Incompleto)
-        N_cn = data_cn.sum() # N específico para este gráfico
+        data_cn = pd.Series(stats_dict['control_nino']).sort_index() 
+        N_cn = data_cn.sum()
         
-        # --- MODIFICADO: Se quita el color para 'Sin Datos' ya que fue filtrado ---
         bars = data_cn.plot(kind='bar', ax=ax_cn, color=['#A7D8A9', '#FFB6C1'])
         
-        # --- MODIFICADO: Título con N y fuente ---
         ax_cn.set_title(f'Estado de Control Niño en {localidad.title()} (N={N_cn})', fontsize=16, fontweight='bold')
         ax_cn.set_ylabel('Cantidad de Niños', fontsize=12)
         ax_cn.tick_params(axis='x', rotation=0)
         ax_cn.spines['right'].set_visible(False)
         ax_cn.spines['top'].set_visible(False)
         
-        # --- MODIFICADO: Añadir etiquetas de datos ---
-        # Se corrige el error. 'bars' es el Eje (Axes), el contenedor está en ax_cn.containers[0]
         if ax_cn.containers:
             ax_cn.bar_label(ax_cn.containers[0], fmt='%.0f', fontsize=10, padding=3)
 
@@ -641,21 +563,17 @@ def graficar_estadisticas_salud(stats_dict, localidad="", N_total_poblacion=0):
     # Gráfico de Vacunas
     if stats_dict['vacunas']:
         fig_vac, ax_vac = plt.subplots(figsize=(8, 5))
-        data_vac = pd.Series(stats_dict['vacunas']).sort_index() # Ordenar (Completas, Incompletas)
-        N_vac = data_vac.sum() # N específico para este gráfico
+        data_vac = pd.Series(stats_dict['vacunas']).sort_index() 
+        N_vac = data_vac.sum()
         
-        # --- MODIFICADO: Se quita el color para 'Sin Datos' ya que fue filtrado ---
         bars = data_vac.plot(kind='bar', ax=ax_vac, color=['#A7D8A9', '#FFB6C1'])
         
-        # --- MODIFICADO: Título con N y fuente ---
         ax_vac.set_title(f'Estado de Vacunación en {localidad.title()} (N={N_vac})', fontsize=16, fontweight='bold')
         ax_vac.set_ylabel('Cantidad de Personas', fontsize=12)
         ax_vac.tick_params(axis='x', rotation=0)
         ax_vac.spines['right'].set_visible(False)
         ax_vac.spines['top'].set_visible(False)
 
-        # --- MODIFICADO: Añadir etiquetas de datos ---
-        # Se corrige el error. 'bars' es el Eje (Axes), el contenedor está en ax_vac.containers[0]
         if ax_vac.containers:
             ax_vac.bar_label(ax_vac.containers[0], fmt='%.0f', fontsize=10, padding=3)
 
@@ -730,15 +648,12 @@ def mostrar_explicacion_formulas():
         st.markdown("**Prevalencia DUAL (DBT+HTA)**")
         st.markdown("Se calcula como un 'Y' lógico: `(Persona tiene DIABETES) Y (Persona tiene HTA)`. La prevalencia se calcula sobre el total de personas únicas.")
         
-        # --- NUEVO ---
         st.markdown("**Estimación de Embarazadas**")
         st.markdown("Se cuentan las personas donde la columna `MUJER_FUM` (Fecha de Última Menstruación) cumple la siguiente condición:")
         st.latex(r"""
         (\text{MUJER_FUM} + 9 \text{ meses}) \geq \text{Hoy}
         """)
-        # st.markdown("*(Donde 'Hoy' se define como 2025-11-06)*") # <- Versión anterior
-        st.markdown("*(Donde 'Hoy' se define como la fecha actual en que se ejecuta el informe)*") # ¡¡CORREGIDO!!
-        # --- FIN NUEVO ---
+        st.markdown("*(Donde 'Hoy' se define como la fecha actual en que se ejecuta el informe)*")
 
         st.markdown("**Índice de Mutualización General (%)**")
         st.latex(r"""
@@ -759,7 +674,6 @@ def mostrar_explicacion_formulas():
 def agregar_seccion_formulas(document):
     """
     Añade una sección de apéndice al documento de Word con la explicación de las fórmulas.
-    (Esta función no necesita cambios para DUAL, lo toma automáticamente)
     """
     try:
         document.add_page_break()
@@ -788,10 +702,7 @@ def agregar_seccion_formulas(document):
         document.add_paragraph('Prevalencia de Enfermedad (%):', style='List Bullet').add_run(" (Total Casos Positivos / Total Personas Únicas) * 100")
         document.add_paragraph('Prevalencia DUAL (DBT+HTA):', style='List Bullet').add_run(" Personas con (DIABETES='SI' Y HTA='SI')")
         
-        # --- NUEVO ---
-        # document.add_paragraph('Estimación de Embarazadas:', style='List Bullet').add_run(" (MUJER_FUM + 9 meses) >= Hoy (2025-11-06)") # <- Versión anterior
-        document.add_paragraph('Estimación de Embarazadas:', style='List Bullet').add_run(" (MUJER_FUM + 9 meses) >= Hoy (Fecha Actual)") # ¡¡CORREGIDO!!
-        # --- FIN NUEVO ---
+        document.add_paragraph('Estimación de Embarazadas:', style='List Bullet').add_run(" (MUJER_FUM + 9 meses) >= Hoy (Fecha Actual)") 
 
         document.add_paragraph('Índice de Mutualización General (%):', style='List Bullet').add_run(" (Total Personas con OS / Total Personas Únicas) * 100")
         document.add_paragraph('Cobertura OS en Enfermos (%):', style='List Bullet').add_run(" (Pacientes [Enfermedad] con OS / Total Pacientes [Enfermedad]) * 100")
@@ -799,17 +710,12 @@ def agregar_seccion_formulas(document):
 
     except Exception as e:
         print(f"Error al agregar sección de fórmulas al Word: {e}")
-        # No se interrumpe la generación del documento si esto falla
         pass
 
 # ---------------------------
 # Función de Informe Word
 # ---------------------------
 
-# --- MODIFICADO ---
-# Se añaden parámetros: tasas_prevalencia_enf, stats_os_general, stats_enf_os
-# (Esta función no necesita cambios para DUAL, lo toma automáticamente)
-# --- ¡¡NUEVO!! Se añade stats_embarazadas, mayores_65_os, menores_15_os ---
 def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_informe, figs, df_piramide_data, anio="", tasas_prevalencia_enf=None, stats_os_general=None, stats_enf_os=None, stats_embarazadas=None, stats_mayores_65_os=None, stats_menores_15_os=None):
     document = Document()
     
@@ -842,7 +748,7 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
         try:
             locale.setlocale(locale.LC_TIME, 'es_ES')
         except locale.Error:
-            pass # Usar el locale por defecto si 'es_ES' falla
+            pass 
 
     # --- Título y Fecha ---
     titulo_principal = document.add_paragraph()
@@ -858,8 +764,8 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
     fecha.alignment = WD_ALIGN_PARAGRAPH.CENTER
     fecha.add_run(f"Fecha de Generación: {pd.Timestamp.now().strftime('%d de %B de %Y')}")
 
-    # --- ¡¡NUEVO!! AVISO IMPORTANTE ---
-    document.add_paragraph() # Espacio
+    # --- AVISO IMPORTANTE (Word) ---
+    document.add_paragraph() 
     aviso_p = document.add_paragraph()
     aviso_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     aviso_run = aviso_p.add_run(
@@ -892,7 +798,6 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
     document.add_paragraph(f"Población Económicamente Activa (PEA): ", style='List Bullet').add_run(str(indices['Población Económicamente Activa (PEA)'])).bold = True
     document.add_paragraph(f"Edad Mediana: ", style='List Bullet').add_run(f"{indices['Edad mediana']} años").bold = True
     
-    # --- ¡¡NUEVO!! ---
     if stats_os_general:
         p_os = document.add_paragraph()
         p_os.add_run('Métricas de Cobertura').bold = True
@@ -900,9 +805,7 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
         p_os_total = stats_os_general.get('Con Obra Social', 0)
         document.add_paragraph(f"Índice de Mutualización General: ", style='List Bullet').add_run(f"{p_os_val} %").bold = True
         document.add_paragraph(f"Total con Obra Social: ", style='List Bullet').add_run(f"{p_os_total}").bold = True
-    # --- FIN NUEVO ---
 
-    # --- ¡¡MODIFICADO!! AÑADIR OS A EMBARAZADAS ---
     if stats_embarazadas:
         total_emb = stats_embarazadas.get('Total Estimado', 0)
         con_os_emb = stats_embarazadas.get('Con Obra Social', 'N/A')
@@ -913,14 +816,11 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
         p_emb.add_run(f" (Con OS: {con_os_emb} | Sin OS: {sin_os_emb})")
 
         p_emb_note = document.add_paragraph(
-            # f"(Cálculo basado en (MUJER_FUM + 9 meses >= 2025-11-06))" # <- Versión anterior
-            f"(Cálculo basado en (MUJER_FUM + 9 meses >= Hoy))" # ¡¡CORREGIDO!!
+            f"(Cálculo basado en (MUJER_FUM + 9 meses >= Hoy))" 
         )
         p_emb_note.runs[0].font.size = Pt(9)
         p_emb_note.runs[0].italic = True
-    # --- FIN MODIFICADO ---
 
-    # --- ¡¡NUEVO!! AÑADIR GRUPOS DE EDAD Y OS ---
     if stats_mayores_65_os:
         total_may = stats_mayores_65_os.get('Total Mayores 65', 0)
         con_os_may = stats_mayores_65_os.get('Con Obra Social', 'N/A')
@@ -936,7 +836,6 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
         p_men = document.add_paragraph(f"Población 0-14 años: ", style='List Bullet')
         p_men.add_run(f"{total_men}").bold = True
         p_men.add_run(f" (Con OS: {con_os_men} | Sin OS: {sin_os_men})")
-    # --- FIN NUEVO ---
 
     p = document.add_paragraph()
     p.add_run('Índices de Dependencia y Envejecimiento').bold = True
@@ -946,8 +845,6 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
     # --- Sección 2: Visualizaciones ---
     document.add_paragraph('Visualizaciones Gráficas', style='Titulo1')
     
-    # --- MODIFICADO: Se elimina 'edad' ---
-    # Definir el orden deseado de los gráficos
     orden_graficos = [
         'piramide', 'genero', 
         'enfermedades', 'control_nino', 'vacunas',
@@ -955,11 +852,10 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
     ]
 
     for fig_key in orden_graficos:
-        fig_obj = figs.get(fig_key) # Obtener la figura por clave
+        fig_obj = figs.get(fig_key) 
         
-        if fig_obj is None: continue # Saltar si la figura no existe (ej: no hay datos de vacunas)
+        if fig_obj is None: continue 
         
-        # Insertar título H2 antes de ciertos gráficos
         if fig_key == 'piramide':
             document.add_paragraph('Gráficos Demográficos', style='Titulo2')
         elif fig_key == 'enfermedades':
@@ -968,22 +864,16 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
             document.add_paragraph('Gráficos Socio-Económicos', style='Titulo2')
             
         img_stream = io.BytesIO()
-        # --- MODIFICADO: Guardar con alta resolución y layout ajustado ---
         fig_obj.savefig(img_stream, format='png', dpi=300, bbox_inches='tight')
         img_stream.seek(0)
         
-        # Ajustar tamaño (pirámide más grande)
         width = Inches(6.5) if fig_key == 'piramide' else Inches(6.0)
         try:
             document.add_picture(img_stream, width=width)
-            # --- MODIFICADO: Usar el título del gráfico (que ya tiene N=) ---
-            # Asegurarse que fig_obj.axes no está vacío
             if fig_obj.axes:
                 p = document.add_paragraph(f"Gráfico: {fig_obj.axes[0].get_title()}", style='Caption')
                 p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             
-            # --- ¡¡NUEVO!! AÑADIR TASAS DE PREVALENCIA AL INFORME ---
-            # Si la figura es la de enfermedades y tenemos los datos de tasas, los añadimos.
             if fig_key == 'enfermedades' and tasas_prevalencia_enf:
                 p_enf = document.add_paragraph()
                 p_enf.add_run('Tasas de Prevalencia (por 100 habitantes):').bold = True
@@ -991,58 +881,47 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
                 if not tasas_prevalencia_enf:
                     document.add_paragraph("No se calcularon tasas de prevalencia.", style='List Bullet')
                 else:
-                    # Añadir cada enfermedad como un item de lista
-                    # DUAL se añade automáticamente si existe en el diccionario
                     for enfermedad, tasa in tasas_prevalencia_enf.items():
                         document.add_paragraph(f"{enfermedad}: ", style='List Bullet').add_run(f"{tasa} %").bold = True
                 
-                # Añadir nota al pie sobre el cálculo
                 total_pob_unica = indices.get('Personas censadas (únicas)', 'N/A')
                 p_enf_caption = document.add_paragraph(
                     f"(Calculado sobre una población única de {total_pob_unica} personas para el período '{anio}')"
                 )
                 p_enf_caption.runs[0].font.size = Pt(10)
                 p_enf_caption.runs[0].italic = True
-            # --- FIN DE LA ADICIÓN ---
 
-            # --- ¡¡NUEVO!! AÑADIR TABLA DE COBERTURA OS-ENFERMEDAD ---
             if fig_key == 'enfermedades' and stats_enf_os:
                 document.add_paragraph('Cobertura de Obra Social en Pacientes con Enfermedades Crónicas', style='Titulo2')
                 
-                # Crear tabla
-                table = document.add_table(rows=1, cols=6) # --- MODIFICADO: de 4 a 6 ---
+                table = document.add_table(rows=1, cols=6) 
                 table.style = 'Table Grid'
                 hdr_cells = table.rows[0].cells
                 hdr_cells[0].text = 'Enfermedad'
                 hdr_cells[1].text = 'Total Pacientes'
                 hdr_cells[2].text = 'Con Obra Social'
                 hdr_cells[3].text = 'Sin Obra Social'
-                hdr_cells[4].text = 'Con OS (%)'    # --- NUEVO ---
-                hdr_cells[5].text = 'Sin OS (%)'    # --- NUEVO ---
+                hdr_cells[4].text = 'Con OS (%)'   
+                hdr_cells[5].text = 'Sin OS (%)'   
                 
-                # DUAL se añade automáticamente si existe en el diccionario
                 for enfermedad, data in stats_enf_os.items():
                     row_cells = table.add_row().cells
                     row_cells[0].text = str(enfermedad)
                     row_cells[1].text = str(data.get('Total Enfermos', 'N/A'))
                     row_cells[2].text = str(data.get('Con Obra Social', 'N/A'))
                     row_cells[3].text = str(data.get('Sin Obra Social', 'N/A'))
-                    row_cells[4].text = str(data.get('Con OS (%)', 'N/A')) + ' %' # --- NUEVO ---
-                    row_cells[5].text = str(data.get('Sin OS (%)', 'N/A')) + ' %' # --- NUEVO ---
+                    row_cells[4].text = str(data.get('Con OS (%)', 'N/A')) + ' %' 
+                    row_cells[5].text = str(data.get('Sin OS (%)', 'N/A')) + ' %' 
                 
-                document.add_paragraph() # Espacio
-            # --- FIN NUEVO ---
+                document.add_paragraph() 
 
         except Exception as e:
-            # No usar st.warning aquí, imprimir en consola
             print(f"Advertencia: No se pudo añadir la imagen {fig_key} al DOCX: {e}")
-
 
     # --- Sección 3: Datos y Proyecciones ---
     document.add_page_break()
     document.add_paragraph('Datos Detallados y Proyecciones', style='Titulo1')
     
-    # Añadir la tabla de datos de la pirámide al Word
     if df_piramide_data is not None and not df_piramide_data.empty:
         document.add_paragraph('Datos de la Pirámide Poblacional por Rango de Edad Quinquenal y Sexo', style='Titulo2')
         table = document.add_table(rows=1, cols=3)
@@ -1069,11 +948,8 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
     for periodo, valor in proyecciones.items():
         document.add_paragraph(f"Población estimada en {periodo}: ", style='List Bullet').add_run(f"≈ {valor:,}").bold = True
 
-    # --- ¡¡NUEVO!! AÑADIR APÉNDICE DE FÓRMULAS ---
     agregar_seccion_formulas(document)
-    # --- FIN NUEVO ---
 
-    # --- ¡¡NUEVO!! AÑADIR ORIGEN DE LOS DATOS (Solicitado por usuario) ---
     document.add_page_break() 
     document.add_paragraph('Origen de los datos', style='Titulo2')
     
@@ -1087,7 +963,6 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
         "Por lo tanto, los resultados dependen directamente de la calidad, coherencia y "
         "actualización de los datos ingresados."
     ).italic = True
-    # --- FIN NUEVO ---
 
     # --- Guardar Documento ---
     buffer = io.BytesIO()
@@ -1100,8 +975,28 @@ def generar_informe_word(indices, tasas, proyecciones, interpretacion, nombre_in
 # ---------------------------
 def main():
     st.set_page_config(page_title="Análisis Demográfico y Sanitario", layout="wide")
+    
+    # ------------------------------
+    # NUEVO: LOGO EN BARRA LATERAL
+    # ------------------------------
+    with st.sidebar:
+        # Puedes poner una imagen real si tienes la URL, por ejemplo:
+        # st.image("https://tu-url-del-logo.com/logo.png", width=150)
+        st.header("🏥 Gestión Sanitaria")
+        st.info("Espacio reservado para Logo Institucional o Publicidad del Ministerio/Hospital.")
+        st.markdown("---")
+
     st.title("🔬 Análisis Demográfico y Socio-Sanitario Avanzado")
     st.subheader("Herramienta de análisis poblacional, caracterización de datos y estadísticas de salud")
+    
+    # ------------------------------
+    # NUEVO: ADVERTENCIA IMPORTANTE (Antes de subir archivo)
+    # ------------------------------
+    st.warning("⚠️ **ATENCIÓN IMPORTANTE ANTES DE SUBIR EL ARCHIVO:**\n\n"
+               "1. Asegúrese de **BORRAR** las columnas 'Latitud' y 'Longitud' de su Excel.\n"
+               "2. Verifique y **ELIMINE** los DNI duplicados para evitar errores en el conteo.\n"
+               "3. El archivo debe estar limpio de filas vacías innecesarias.")
+    
     st.markdown("---")
 
     uploaded_file = st.file_uploader("📂 Subir archivo Excel", type=["xlsx"])
@@ -1157,7 +1052,7 @@ def main():
                 st.info("Por favor, seleccione una columna de fecha para continuar.")
                 return
 
-            # --- ¡¡AQUÍ ESTÁ LA CORRECCIÓN DE FECHA!! ---
+            # --- DIAGNÓSTICO DE DATOS ---
             st.markdown("### 2. Diagnóstico de Datos")
             
             total_filas_inicial = len(df_original)
@@ -1209,9 +1104,8 @@ def main():
             st.markdown(f"👀 Vista previa de los datos **después** de eliminar filas sin fecha válida. Quedan **{len(df_original)}** filas.")
             st.dataframe(df_original.head())
             
-            # --- ¡¡NUEVO!! MOSTRAR EXPLICACIÓN DE FÓRMULAS ---
+            # --- MOSTRAR EXPLICACIÓN DE FÓRMULAS ---
             mostrar_explicacion_formulas()
-            # --- FIN NUEVO ---
 
             st.markdown("---")
 
@@ -1263,7 +1157,7 @@ def main():
                         
                         st.markdown("---")
                         st.markdown("#### Gráficos de Variables Socio-Económicas Clave")
-                        # --- MODIFICADO: No necesita N, lo calcula internamente ---
+                        
                         figs_adicionales = graficar_analisis_adicional(df_sin_duplicados_filtrado)
                         if figs_adicionales:
                             for key, fig in figs_adicionales.items():
@@ -1275,28 +1169,22 @@ def main():
                     st.markdown("---")
                     st.subheader(f"⚕️ Estadísticas Socio-Sanitarias ({anio_seleccionado})")
                     
-                    # --- MODIFICADO: Obtener N para gráficos de salud ---
                     N_total_poblacion = indices['Personas censadas (únicas)']
                     
-                    # --- ¡¡MODIFICADO!! ---
-                    # Calcular estadísticas Y FILTROS de salud
-                    # Usamos .copy() para que la limpieza de OBRA_SOCIAL no afecte a otros tabs
                     stats_salud, filtros_salud = calcular_estadisticas_salud(df_sin_duplicados_filtrado.copy()) 
                     
-                    # --- MODIFICADO: Pasar N_total_poblacion ---
                     figs_salud = graficar_estadisticas_salud(stats_salud, localidad, N_total_poblacion)
 
-                    # --- ¡¡NUEVO!! Extraer datos de OS ---
+                    # --- Extraer datos de OS ---
                     stats_os_general = stats_salud.get('obra_social_general', {})
                     stats_enf_os = stats_salud.get('enfermedades_obra_social', {})
-                    stats_embarazadas = stats_salud.get('embarazadas', {}) # ¡¡NUEVO!!
-                    # --- ¡¡¡NUEVOS DATOS EXTRAÍDOS!!! ---
+                    stats_embarazadas = stats_salud.get('embarazadas', {}) 
+                    
                     stats_mayores_65_os = stats_salud.get('mayores_65_os', {})
                     stats_menores_15_os = stats_salud.get('menores_15_os', {})
-                    # --- FIN NUEVO ---
+                    
 
-
-                    # --- ¡¡NUEVO!! Mostrar Métrica de Cobertura General ---
+                    # --- Mostrar Métrica de Cobertura General ---
                     if stats_os_general:
                         st.metric(
                             label="Índice de Mutualización General (con OS)", 
@@ -1306,7 +1194,7 @@ def main():
                     else:
                         st.info("No se encontró la columna `OBRA_SOCIAL` para calcular el índice de mutualización.")
                     
-                    # --- ¡¡MODIFICADO!! Mostrar Métrica de Embarazadas con OS ---
+                    # --- Mostrar Métrica de Embarazadas con OS ---
                     if stats_embarazadas:
                         total_emb = stats_embarazadas.get('Total Estimado', 0)
                         con_os_emb = stats_embarazadas.get('Con Obra Social', 0)
@@ -1314,14 +1202,12 @@ def main():
                         st.metric(
                             label="🤰 Embarazadas (Estimado)", 
                             value=f"{total_emb}",
-                            # help=f"Total: {total_emb} | Con OS: {con_os_emb} | Sin OS: {sin_os_emb}. (Cálculo basado en MUJER_FUM)" # <- Versión anterior
-                            help=f"Total: {total_emb} | Con OS: {con_os_emb} | Sin OS: {sin_os_emb}. (Cálculo basado en MUJER_FUM y fecha actual)" # ¡¡CORREGIDO!!
+                            help=f"Total: {total_emb} | Con OS: {con_os_emb} | Sin OS: {sin_os_emb}. (Cálculo basado en MUJER_FUM y fecha actual)" 
                         )
                     else:
                         st.info("No se encontró la columna `MUJER_FUM` para estimar embarazos.")
-                    # --- FIN MODIFICADO ---
 
-                    # --- ¡¡NUEVO!! Mostrar Métricas de Edad y OS ---
+                    # --- Mostrar Métricas de Edad y OS ---
                     if stats_mayores_65_os:
                         total_mayores = stats_mayores_65_os.get('Total Mayores 65', 0)
                         con_os_mayores = stats_mayores_65_os.get('Con Obra Social', 0)
@@ -1341,12 +1227,10 @@ def main():
                             value=f"{total_menores}",
                             help=f"Total: {total_menores} | Con OS: {con_os_menores} | Sin OS: {sin_os_menores}"
                         )
-                    # --- FIN NUEVO ---
 
+                    st.markdown("---") 
 
-                    st.markdown("---") # Separador visual
-
-                    # --- ¡¡NUEVO!! Expander para Cobertura en Enfermedades ---
+                    # --- Expander para Cobertura en Enfermedades ---
                     with st.expander(f"🔍 Ver Cobertura de Obra Social en Enfermedades Crónicas ({anio_seleccionado})"):
                         if stats_enf_os:
                             df_enf_os = pd.DataFrame.from_dict(stats_enf_os, orient='index')
@@ -1355,20 +1239,17 @@ def main():
                             st.caption("Esta tabla muestra, del total de pacientes con una enfermedad (incluyendo DUAL), cuántos tienen OS y el porcentaje que representan.")
                         else:
                             st.info("No se encontraron datos de 'OBRA_SOCIAL' o no hay casos de enfermedades para analizar la cobertura.")
-                    # --- FIN NUEVO ---
 
 
-                    # --- ¡¡NUEVO!! Cálculo de Tasa de Prevalencia de Enfermedades ---
+                    # --- Cálculo de Tasa de Prevalencia de Enfermedades ---
                     tasas_prevalencia = {}
                     total_poblacion_unica = indices['Personas censadas (únicas)']
                     
                     if total_poblacion_unica > 0 and stats_salud['enfermedades']:
-                        # DUAL se calcula automáticamente porque ya está en stats_salud['enfermedades']
                         for enfermedad, casos in stats_salud['enfermedades'].items():
                             # Tasa por 100 habitantes (Prevalencia)
                             tasa = (casos / total_poblacion_unica) * 100
                             tasas_prevalencia[enfermedad] = round(tasa, 2)
-                    # --- FIN DEL NUEVO CÁLCULO ---
 
                     col_salud1, col_salud2 = st.columns(2)
                     
@@ -1377,23 +1258,18 @@ def main():
                         if figs_salud.get('enfermedades'):
                             st.pyplot(figs_salud['enfermedades'])
                             
-                            # --- MODIFICADO ---
-                            # Crear DataFrame base con los conteos
                             df_enf_stats = pd.DataFrame.from_dict(
                                 stats_salud['enfermedades'], 
                                 orient='index', 
                                 columns=['Casos Positivos']
                             )
                             
-                            # Añadir la columna de prevalencia si se calculó
                             if tasas_prevalencia:
                                 df_enf_stats['Prevalencia (%)'] = df_enf_stats.index.map(tasas_prevalencia)
                                 df_enf_stats['Prevalencia (%)'] = df_enf_stats['Prevalencia (%)'].fillna(0)
                             
-                            # Mostrar el dataframe combinado
                             st.dataframe(df_enf_stats)
                             st.caption(f"La prevalencia (%) se calcula sobre el total de personas únicas ({total_poblacion_unica}).")
-                            # --- FIN DE LA MODIFICACIÓN ---
 
                         else:
                             st.info("No se encontraron datos o columnas de enfermedades (ej: DIABETES, HTA).")
@@ -1402,7 +1278,6 @@ def main():
                         st.markdown("#### Estado de Control Niño")
                         if figs_salud.get('control_nino'):
                             st.pyplot(figs_salud['control_nino'])
-                            # --- MODIFICADO: Ya no se calcula el % ---
                             st.dataframe(pd.DataFrame.from_dict(stats_salud['control_nino'], orient='index', columns=['Cantidad']))
                         else:
                             st.info("No se encontró la columna 'NIÑO_CONTROLES_COMPLETOS' o no hay datos.")
@@ -1410,7 +1285,6 @@ def main():
                         st.markdown("#### Estado de Vacunación")
                         if figs_salud.get('vacunas'):
                             st.pyplot(figs_salud['vacunas'])
-                            # --- MODIFICADO: Ya no se calcula el % ---
                             st.dataframe(pd.DataFrame.from_dict(stats_salud['vacunas'], orient='index', columns=['Cantidad']))
                         else:
                             st.info("No se encontró la columna 'NIÑO_VACUNACION_COMPLETA' o no hay datos.")
@@ -1437,18 +1311,13 @@ def main():
                     # --- GRÁFICOS DEMOGRÁFICOS PRINCIPALES ---
                     st.subheader(f"Gráficos Demográficos Principales ({anio_seleccionado})")
                     
-                    # Usamos .copy() para que el df no se modifique entre pestañas
                     fig_piramide, df_piramide_data = graficar_piramide(df_sin_duplicados_filtrado.copy(), localidad)
-                    # --- MODIFICADO: Gráfico de edad eliminado ---
-                    # fig_edad = graficar_distribucion_edad(df_sin_duplicados_filtrado, localidad) 
                     fig_genero = graficar_genero(df_sin_duplicados_filtrado, localidad)
                     
                     col_graf1, col_graf2 = st.columns([2, 1])
                     with col_graf1:
                         st.pyplot(fig_piramide)
                     with col_graf2:
-                        # --- MODIFICADO: Gráfico de edad eliminado ---
-                        # st.pyplot(fig_edad)
                         st.pyplot(fig_genero)
 
                     st.markdown("---")
@@ -1457,12 +1326,11 @@ def main():
 
 
                     # --------------------------------------------------------------------------------
-                    # NUEVA SECCIÓN: ANÁLISIS POR AGENTE SANITARIO (INICIO)
+                    # ANÁLISIS POR AGENTE SANITARIO
                     # --------------------------------------------------------------------------------
                     st.markdown("---")
                     st.subheader(f"🕵️ Análisis Individual por Agente Sanitario ({anio_seleccionado})")
                     
-                    # Determinar qué columna usar (USUARIO_AGENTE_SANITARIO es la prioridad)
                     col_agente = None
                     if 'USUARIO_AGENTE_SANITARIO' in df_sin_duplicados_filtrado.columns:
                         col_agente = 'USUARIO_AGENTE_SANITARIO'
@@ -1470,7 +1338,6 @@ def main():
                         col_agente = 'NOMBRE_AGENTE_SANITARIO'
                     
                     if col_agente:
-                        # Obtener lista de agentes únicos (ordenados, sin nulos)
                         lista_agentes = sorted(df_sin_duplicados_filtrado[col_agente].dropna().astype(str).unique())
                         
                         if len(lista_agentes) > 0:
@@ -1488,8 +1355,6 @@ def main():
                                 st.info(f"Mostrando estadísticas exclusivas para la población a cargo de este agente.")
 
                                 # --- 2. CALCULAR MÉTRICAS AGENTE ---
-                                # Nota: Para 'indices', pasamos df_agente en ambos argumentos. 
-                                # La estimación de viviendas será basada en las direcciones de este agente.
                                 indices_agente = calcular_indices_avanzados(df_agente, df_agente)
                                 stats_salud_agente, _ = calcular_estadisticas_salud(df_agente) # No necesitamos filtros booleanos aquí
                                 N_agente = indices_agente['Personas censadas (únicas)']
@@ -1499,14 +1364,12 @@ def main():
                                 col_ag1.metric("👥 Personas (Agente)", f"{N_agente}")
                                 col_ag2.metric("🏠 Viviendas (Estimado)", f"{indices_agente['Viviendas relevadas (estimado)']}")
                                 
-                                # Extraer OS general Agente
                                 os_gral_agente = stats_salud_agente.get('obra_social_general', {})
                                 val_os_agente = os_gral_agente.get('Indice Mutualizacion (%)', 0)
                                 col_ag3.metric("🏥 Cobertura OS General", f"{val_os_agente}%")
 
                                 # --- 4. GRÁFICOS AGENTE ---
                                 st.markdown("#### 📊 Pirámide y Género (Agente)")
-                                # --- MODIFICADO: Capturar df_piramide_agente ---
                                 fig_pyr_ag, df_piramide_agente = graficar_piramide(df_agente, f"Agente: {agente_seleccionado}")
                                 fig_gen_ag = graficar_genero(df_agente, f"Agente: {agente_seleccionado}")
 
@@ -1524,7 +1387,6 @@ def main():
                                 else:
                                     st.write("Sin datos de enfermedades para este agente.")
                                 
-                                # Vacunas y Control Agente
                                 col_vac_ag1, col_vac_ag2 = st.columns(2)
                                 with col_vac_ag1:
                                     if figs_salud_agente.get('control_nino'):
@@ -1547,13 +1409,12 @@ def main():
                                         st.write("**Cobertura OS en Enfermos:**")
                                         st.write(stats_salud_agente.get('enfermedades_obra_social', "Sin datos"))
 
-                                # --- 6. DESCARGA EXCEL POR AGENTE (¡¡NUEVO!!) ---
+                                # --- 6. DESCARGA EXCEL POR AGENTE ---
                                 st.markdown("---")
                                 st.markdown("##### 📥 Descargar Estadísticas de este Agente")
                                 
                                 excel_buffer_agente = io.BytesIO()
                                 with pd.ExcelWriter(excel_buffer_agente, engine='openpyxl') as writer:
-                                    # --- NUEVO: Hoja de Resumen General con los datos solicitados ---
                                     resumen_data = {
                                         'Indicador': ['Personas (Agente)', 'Viviendas (Estimado)', 'Cobertura OS General (%)'],
                                         'Valor': [
@@ -1564,11 +1425,9 @@ def main():
                                     }
                                     pd.DataFrame(resumen_data).to_excel(writer, index=False, sheet_name='Resumen_General')
 
-                                    # 1. Pirámide
                                     if not df_piramide_agente.empty:
                                         df_piramide_agente.to_excel(writer, index=False, sheet_name='Piramide_Poblacional')
                                     
-                                    # 2. Enfermedades (Calculando prevalencia con N del agente)
                                     if stats_salud_agente['enfermedades']:
                                         df_enf_stats_agente = pd.DataFrame.from_dict(
                                             stats_salud_agente['enfermedades'], 
@@ -1580,22 +1439,18 @@ def main():
                                             df_enf_stats_agente['Prevalencia (%)'] = df_enf_stats_agente['Prevalencia (%)'].round(2)
                                         df_enf_stats_agente.to_excel(writer, sheet_name='Enfermedades')
                                     
-                                    # 3. Cobertura OS Enfermedad
                                     stats_enf_os_agente = stats_salud_agente.get('enfermedades_obra_social', {})
                                     if stats_enf_os_agente:
                                         pd.DataFrame.from_dict(stats_enf_os_agente, orient='index').to_excel(writer, sheet_name='Cobertura_OS_Enfermedad')
                                     
-                                    # 4. Cobertura OS General (Detalle numérico si se desea, aunque ya está en resumen)
                                     stats_os_gen_agente = stats_salud_agente.get('obra_social_general', {})
                                     if stats_os_gen_agente:
                                         pd.DataFrame.from_dict(stats_os_gen_agente, orient='index', columns=['Valor']).to_excel(writer, sheet_name='Cobertura_OS_General')
                                     
-                                    # 5. Embarazadas
                                     stats_emb_agente = stats_salud_agente.get('embarazadas', {})
                                     if stats_emb_agente:
                                         pd.DataFrame.from_dict(stats_emb_agente, orient='index', columns=['Valor']).to_excel(writer, sheet_name='Embarazadas_Estimado')
 
-                                    # 6. Grupos Edad OS
                                     stats_may65_agente = stats_salud_agente.get('mayores_65_os', {})
                                     if stats_may65_agente:
                                         pd.DataFrame.from_dict(stats_may65_agente, orient='index', columns=['Valor']).to_excel(writer, sheet_name='Mayores_65_OS')
@@ -1604,7 +1459,6 @@ def main():
                                     if stats_men15_agente:
                                         pd.DataFrame.from_dict(stats_men15_agente, orient='index', columns=['Valor']).to_excel(writer, sheet_name='Menores_15_OS')
 
-                                    # 7. Control Niño y Vacunas
                                     if stats_salud_agente['control_nino']:
                                         pd.DataFrame.from_dict(stats_salud_agente['control_nino'], orient='index', columns=['Cantidad']).to_excel(writer, sheet_name='Control_Nino')
                                     if stats_salud_agente['vacunas']:
@@ -1624,12 +1478,7 @@ def main():
                     else:
                         st.info("No se encontró la columna `USUARIO_AGENTE_SANITARIO` (ni `NOMBRE_AGENTE_SANITARIO`) para realizar el desglose por agente.")
 
-                    # --------------------------------------------------------------------------------
-                    # FIN NUEVA SECCIÓN
-                    # --------------------------------------------------------------------------------
-
-
-                    # --- DESCARGAS (con keys únicas por pestaña) ---
+                    # --- DESCARGAS ---
                     st.markdown("---")
                     st.subheader("📥 Zona de Descargas")
                     
@@ -1637,7 +1486,6 @@ def main():
                     with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
                         df_piramide_data.to_excel(writer, index=False, sheet_name='Piramide_Poblacional')
                         
-                        # Guardar datos de enfermedades (Casos y Prevalencia)
                         if stats_salud['enfermedades']:
                             df_enf_stats_excel = pd.DataFrame.from_dict(
                                 stats_salud['enfermedades'], 
@@ -1649,26 +1497,19 @@ def main():
                                 df_enf_stats_excel['Prevalencia (%)'] = df_enf_stats_excel['Prevalencia (%)'].fillna(0)
                             df_enf_stats_excel.to_excel(writer, sheet_name='Enfermedades')
 
-                        # --- ¡¡NUEVO!! Añadir datos de OS a Excel ---
-                        # DUAL se añade automáticamente
                         if stats_enf_os:
                             pd.DataFrame.from_dict(stats_enf_os, orient='index').to_excel(writer, sheet_name='Cobertura_OS_Enfermedad')
                         if stats_os_general:
                             pd.DataFrame.from_dict(stats_os_general, orient='index', columns=['Valor']).to_excel(writer, sheet_name='Cobertura_OS_General')
                         
-                        # --- ¡¡MODIFICADO!! Añadir datos de Embarazadas a Excel (ahora con OS) ---
                         if stats_embarazadas:
                             pd.DataFrame.from_dict(stats_embarazadas, orient='index', columns=['Valor']).to_excel(writer, sheet_name='Embarazadas_Estimado')
                         
-                        # --- ¡¡NUEVO!! AÑADIR DATOS DE GRUPOS DE EDAD Y OS ---
                         if stats_mayores_65_os:
                             pd.DataFrame.from_dict(stats_mayores_65_os, orient='index', columns=['Valor']).to_excel(writer, sheet_name='Mayores_65_OS')
                         if stats_menores_15_os:
                             pd.DataFrame.from_dict(stats_menores_15_os, orient='index', columns=['Valor']).to_excel(writer, sheet_name='Menores_15_OS')
-                        # --- FIN NUEVO ---
 
-
-                        # --- MODIFICADO: Ya no se añade % ---
                         if stats_salud['control_nino']:
                                 pd.DataFrame.from_dict(stats_salud['control_nino'], orient='index', columns=['Cantidad']).to_excel(writer, sheet_name='Control_Nino')
                         if stats_salud['vacunas']:
@@ -1680,45 +1521,36 @@ def main():
                         data=excel_buffer,
                         file_name=f"Datos_Demograficos_Salud_{localidad.replace(' ', '_')}_{anio_seleccionado}.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        key=f"download_excel_{anio_seleccionado}" # Key única
+                        key=f"download_excel_{anio_seleccionado}" 
                     )
 
                     st.markdown("---")
                     
                     st.subheader(f"📥 Descargar Informe Completo en Word ({anio_seleccionado})")
                     
-                    # El botón de generar debe tener una key única
                     if st.button(f"Generar Informe para {anio_seleccionado}", key=f"generate_word_{anio_seleccionado}"):
-                        if nombre_informe_word: # Nombre tomado del sidebar
+                        if nombre_informe_word: 
                             with st.spinner(f"Generando informe para {anio_seleccionado}..."):
-                                # --- MODIFICADO: Se elimina 'edad' ---
                                 figs_dict = {
                                     'piramide': fig_piramide, 
-                                    # 'edad': fig_edad, # ELIMINADO
                                     'genero': fig_genero
                                 }
-                                # Añadir los gráficos socio-económicos
                                 figs_dict.update(figs_adicionales)
-                                # AÑADIR LOS NUEVOS GRÁFICOS DE SALUD
                                 figs_dict.update(figs_salud)
 
-                                # --- MODIFICADO ---
-                                # Pasar los nuevos diccionarios 'stats_os_general' y 'stats_enf_os'
-                                # DUAL se pasa automáticamente dentro de estos diccionarios
-                                # --- ¡¡NUEVO!! Pasar también los de grupos de edad ---
                                 informe_word_buffer = generar_informe_word(
                                     indices, tasas, proyecciones, 
                                     interpretacion_piramide, 
-                                    nombre_informe_word, # Nombre global
-                                    figs_dict, # Diccionario completo con todos los gráficos
+                                    nombre_informe_word, 
+                                    figs_dict, 
                                     df_piramide_data,
-                                    anio=anio_seleccionado, # Pasar el año al informe
+                                    anio=anio_seleccionado, 
                                     tasas_prevalencia_enf=tasas_prevalencia,
-                                    stats_os_general=stats_os_general, # ¡¡NUEVO PARÁMETRO!!
-                                    stats_enf_os=stats_enf_os, # ¡¡NUEVO PARÁMETRO!!
-                                    stats_embarazadas=stats_embarazadas, # ¡¡NUEVO PARÁMETRO!!
-                                    stats_mayores_65_os=stats_mayores_65_os, # ¡¡NUEVO!!
-                                    stats_menores_15_os=stats_menores_15_os  # ¡¡NUEVO!!
+                                    stats_os_general=stats_os_general, 
+                                    stats_enf_os=stats_enf_os, 
+                                    stats_embarazadas=stats_embarazadas, 
+                                    stats_mayores_65_os=stats_mayores_65_os, 
+                                    stats_menores_15_os=stats_menores_15_os  
                                 )
                                 
                                 st.download_button(
@@ -1726,12 +1558,12 @@ def main():
                                     data=informe_word_buffer,
                                     file_name=f"Informe_{nombre_informe_word.replace(' ', '_')}_{anio_seleccionado}.docx",
                                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                    key=f"download_word_button_{anio_seleccionado}" # Key única
+                                    key=f"download_word_button_{anio_seleccionado}" 
                                 )
                         else:
                             st.warning("Por favor, ingrese un nombre para el informe en la barra lateral izquierda antes de generarlo.")
 
-                    # --- ¡¡¡SECCIÓN TOTALMENTE NUEVA PARA DESCARGAR PADRONES!!! ---
+                    # --- SECCIÓN DESCARGAR PADRONES ---
                     st.markdown("---")
                     st.subheader(f"🧑‍🤝‍🧑 Descarga de Padrones Específicos ({anio_seleccionado})")
                     st.info(
@@ -1739,63 +1571,45 @@ def main():
                         "(una solapa por criterio)."
                     )
 
-                    # Definir columnas base y opcionales para el padrón
-                    # El usuario solicitó: Nombre, Apellido, DNI, Domicilio, Agente Sanitario
-                    
-                    # Copiamos el df para no alterar el original de la pestaña
                     df_para_padrones = df_sin_duplicados_filtrado.copy()
                     
-                    # Renombrar 'DIRECCION' -> 'DOMICILIO' para la exportación
                     if 'DIRECCION' in df_para_padrones.columns:
                         df_para_padrones.rename(columns={'DIRECCION': 'DOMICILIO'}, inplace=True)
 
-                    # Lista de columnas deseadas
                     columnas_deseadas = [
                         'DNI', 
                         'NOMBRE', 
                         'APELLIDO', 
-                        'EDAD',               # Añadido para contexto
-                        'GENERO',             # Añadido para contexto
-                        'DOMICILIO',          # El 'VIVIENDA_DIRECCION' renombrado
+                        'EDAD',               
+                        'GENERO',             
+                        'DOMICILIO',          
                         'NOMBRE_AGENTE_SANITARIO',
-                        'USUARIO_AGENTE_SANITARIO' # Agregado por si acaso
+                        'USUARIO_AGENTE_SANITARIO' 
                     ]
                     
-                    # Columnas finales que SÍ existen en el DataFrame
                     cols_padron_finales = [col for col in columnas_deseadas if col in df_para_padrones.columns]
 
-                    # Crear el buffer de Excel en memoria
                     padron_excel_buffer = io.BytesIO()
                     try:
                         with pd.ExcelWriter(padron_excel_buffer, engine='openpyxl') as writer:
                             
                             if not filtros_salud:
-                                # Si no hay filtros, al menos crear una hoja vacía para no dar error
                                 pd.DataFrame(["No se generaron filtros de salud."]).to_excel(writer, sheet_name='Error', index=False)
                             else:
-                                # Iterar sobre el diccionario de filtros que obtuvimos de 'calcular_estadisticas_salud'
                                 for nombre_filtro, filtro_bool in filtros_salud.items():
                                     
-                                    # Aplicar el filtro booleano al DF
-                                    # 'filtro_bool' es una Serie booleana alineada con df_para_padrones
                                     padron_df = df_para_padrones[filtro_bool]
-                                    
-                                    # Seleccionar solo las columnas deseadas
                                     padron_df_final = padron_df[cols_padron_finales]
                                     
-                                    # Limpiar el nombre de la solapa (ej: "DUAL (DBT+HTA)" -> "DUAL_DBT_HTA")
                                     sheet_name = nombre_filtro.replace(' (', '_').replace('+', '').replace(')', '').replace(' ', '_')
                                     sheet_name = sheet_name.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
-                                    sheet_name = sheet_name[:31] # Límite de 31 chars para solapas
+                                    sheet_name = sheet_name[:31] 
                                     
-                                    # Escribir en la solapa solo si hay datos
                                     if not padron_df_final.empty:
                                         padron_df_final.to_excel(writer, sheet_name=sheet_name, index=False)
                                     else:
-                                        # Opcional: escribir una hoja vacía o con un mensaje
                                         pd.DataFrame([f"No hay personas que cumplan con el criterio '{nombre_filtro}'."]).to_excel(writer, sheet_name=sheet_name, index=False)
                         
-                        # Después del 'with' block, el buffer está listo
                         padron_excel_buffer.seek(0)
                         
                         st.download_button(
@@ -1803,13 +1617,11 @@ def main():
                             data=padron_excel_buffer,
                             file_name=f"Padron_Riesgo_{localidad.replace(' ', '_')}_{anio_seleccionado}.xlsx",
                             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                            key=f"download_padron_{anio_seleccionado}" # Key única
+                            key=f"download_padron_{anio_seleccionado}" 
                         )
 
                     except Exception as e:
                         st.error(f"Error al generar el Excel del padrón: {e}")
-                    # --- FIN DE LA NUEVA SECCIÓN ---
-
 
     else:
         st.info("☝️ Sube un archivo Excel para comenzar el análisis.")
@@ -1830,6 +1642,30 @@ def main():
         
         (Las categorías **DUAL (DBT+HTA)** y **Embarazadas** se calcularán automáticamente)
         """)
+    
+    # ------------------------------
+    # NUEVO: PIE DE PÁGINA (FOOTER)
+    # ------------------------------
+    st.markdown("---") # Línea separadora
+    col_footer_1, col_footer_2 = st.columns(2)
+    
+    with col_footer_1:
+        st.markdown("**Diseñado y Desarrollado por:**")
+        st.markdown("💻 Tec. Muñoz, Mauricio Ivan")
+    
+    with col_footer_2:
+        st.caption("⚠️ **Descargo de Responsabilidad:**")
+        st.caption(
+            "Esta aplicación puede contener errores o inconsistencias. "
+            "Los resultados dependen directamente de la calidad de los datos cargados. "
+            "Se ruega corroborar toda la información antes de su presentación oficial."
+        )
+
+    # --- BOTÓN DE TECITO ---
+    # Se agrega al final para que cargue después del contenido.
+    components.html("""
+    <script type="text/javascript" src="https://cdn.tecito.app/static/js/button.v1.3.js" data-name="bmc-button" data-slug="ivannefa" data-color="#ef4444" data-emoji="" data-font="Comic" data-text="Invitame un tecito" data-outline-color="#000" data-font-color="#FFF" data-tecito-color="#FFF"></script>
+    """, height=60) # Ajuste de altura para contener el botón
 
 
 if __name__ == "__main__":
